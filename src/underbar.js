@@ -50,7 +50,15 @@
   // Note: _.each does not have a return value, but rather simply runs the
   // iterator function over each item in the input collection.
   _.each = function(collection, iterator) {
-
+    if (Array.isArray(collection)) {
+      for (var i = 0; i < collection.length; i++) {
+        collection[i] = iterator(collection[i], i, collection);
+      }
+    } else if (typeof collection === 'object') {
+      for (const key in collection) {
+        collection[key] = iterator(collection[key], key, collection);
+      }
+    }
   };
 
   // Returns the index at which value can be found in the array, or -1 if value
@@ -72,16 +80,27 @@
 
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, test) {
+    var results = [];
+    _.each(collection, function(el) {
+      if (test(el)) {
+        results.push(el);
+      }
+    });
+    return results;
   };
 
   // Return all elements of an array that don't pass a truth test.
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
+    return _.filter(collection, function(el) {
+      return test(el) ? false : true;
+    });
   };
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator) {
+
   };
 
 
