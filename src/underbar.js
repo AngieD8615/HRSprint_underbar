@@ -52,11 +52,11 @@
   _.each = function(collection, iterator) {
     if (Array.isArray(collection)) {
       for (var i = 0; i < collection.length; i++) {
-        collection[i] = iterator(collection[i], i, collection);
+        iterator(collection[i], i, collection);
       }
     } else if (typeof collection === 'object') {
       for (const key in collection) {
-        collection[key] = iterator(collection[key], key, collection);
+        iterator(collection[key], key, collection);
       }
     }
   };
@@ -68,11 +68,13 @@
     // implemented for you. Instead of using a standard `for` loop, though,
     // it uses the iteration helper `each`, which you will need to write.
     var result = -1;
+    // console.log("start", array);
 
     _.each(array, function(item, index) {
       if (item === target && result === -1) {
         result = index;
       }
+      // console.log("end", array)
     });
 
     return result;
@@ -99,8 +101,15 @@
   };
 
   // Produce a duplicate-free version of the array.
-  _.uniq = function(array, isSorted, iterator) {
-
+  _.uniq = function(array, isSorted, iterator = _.identity) {
+    const uniqEle = {};
+    _.each(array, function(el) {
+      console.log('uniqEle, !iterator(uniqEle[el]), array', uniqEle, iterator(uniqEle[el]), array);
+      if (uniqEle[iterator(el)] === undefined) {
+        uniqEle[iterator(el)] = el;
+      }
+    });
+    return Object.values(uniqEle);
   };
 
 
