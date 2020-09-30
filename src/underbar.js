@@ -118,6 +118,22 @@
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
+    let newColl;
+    if (Array.isArray(collection)) {
+      newColl = [];
+    } else if (typeof collection === 'object') {
+      newColl = {};
+    }
+
+    _.each(collection, (el) => {
+      if (Array.isArray(collection)) {
+
+        newColl.push(iterator(el));
+      } else if (typeof collection === 'object') {
+        newColl[el] = iterator(collection[el]);
+      }
+    });
+    return newColl;
   };
 
   /*
