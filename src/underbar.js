@@ -104,7 +104,6 @@
   _.uniq = function(array, isSorted, iterator = _.identity) {
     const uniqEle = {};
     _.each(array, function(el) {
-      console.log('uniqEle, !iterator(uniqEle[el]), array', uniqEle, iterator(uniqEle[el]), array);
       if (uniqEle[iterator(el)] === undefined) {
         uniqEle[iterator(el)] = el;
       }
@@ -175,6 +174,17 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+    if (arguments.length === 2) {
+      accumulator = collection[0];
+      _.each(collection.slice(1), (item) => {
+        accumulator = iterator(accumulator, item);
+      });
+      return accumulator;
+    }
+    _.each(collection, (item) => {
+      accumulator = iterator(accumulator, item);
+    });
+    return accumulator;
   };
 
   // Determine if the array or object contains a given value (using `===`).
@@ -191,14 +201,27 @@
 
 
   // Determine whether all of the elements match a truth test.
-  _.every = function(collection, iterator) {
-    // TIP: Try re-using reduce() here.
+  // [2, 4, 11, 8, 6] (num) => num % 2 === 0
+  _.every = function(collection, iterator = _.identity) {
+    return _.reduce(collection, (accumulator, item) => {
+      if (!iterator(item)) {
+        return false;
+      }
+      return accumulator;
+    }, true);
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
-  _.some = function(collection, iterator) {
+  _.some = function(collection, iterator = _.identity) {
     // TIP: There's a very clever way to re-use every() here.
+    // if every item in the collectionis false => return false => else return true
+    // change iterator to not.
+    let noneAreTrue = _.every(collection, (item) => {
+      return !iterator(item);
+    });
+    return !noneAreTrue;
+
   };
 
 
@@ -221,11 +244,27 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    // for each obj in args, iterate over object and assign keys to first object
+    for (var i = 1; i < arguments.length; i++) {
+      for (let key in arguments[i]) {
+        obj[key] = arguments[i][key];
+      }
+    }
+    return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    let objs = [...arguments];
+    for (var i = 1; i < objs.length; i++) {
+      for (let key in objs[i]) {
+        if (obj[key] === undefined) {
+          obj[key] = arguments[i][key];
+        }
+      }
+    }
+    return obj;
   };
 
 
@@ -269,6 +308,18 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var previousResults = {};
+    var result;
+
+    return function() {
+      let argStr = JSON.stringify(arguments);
+      if (previousResults[argStr] === undefined) {
+        result = func.apply(this, arguments);
+        previousResults[argStr] = result;
+      }
+      return result;
+    };
+
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -278,6 +329,7 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    return setTimeout(...arguments);
   };
 
 

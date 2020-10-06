@@ -58,7 +58,10 @@
       it('should return false given an array and a value not in that array', function() {
         // Replace this line with an `expect` statement that tests
         // the behavior described by the `it` string
-        throw new Error('This test is missing.');
+        var array = [10, 20, 30, 50, 40, 25, 15, 5, 'happy', 'go', 'lucky'];
+        expect(_.contains(array, 31)).to.be.false;
+        expect(_.contains(array, 'go')).to.be.true;
+        // throw new Error('This test is missing.');
       });
 
       it('should return true given a object and a value from that object', function() {
@@ -91,7 +94,8 @@
       it('fails for a collection of all-falsy values', function() {
         // Replace this line with an `expect` statement that tests
         // the behavior described by the `it` string
-        throw new Error('This test is missing.');
+        // throw new Error('This test is missing.');
+        expect(_.every([false, undefined, null], _.identity)).to.be.false;
       });
 
       it('fails for a collection containing mixed falsy and truthy values', function() {
@@ -149,7 +153,10 @@
       it('should fail for a set containing no matching values', function() {
         // Replace this line with an `expect` statement that tests
         // the behavior described by the `it` string
-        throw new Error('This test is missing.');
+        // throw new Error('This test is missing.');
+        expect(_.some([3, 5, 7, 21], (num) => {
+          return num % 2 === 0;
+        })).to.be.false;
       });
 
       it('should pass for a collection containing one matching value', function() {
@@ -189,7 +196,13 @@
       it('should override properties found on the destination', function() {
         // Replace this line with an `expect` statement that tests
         // the behavior described by the `it` string
-        throw new Error('This test is missing.');
+        // throw new Error('This test is missing.');
+        var destination = {a: 'b', b: 2, c: false};
+        var source = {b: 'yes', d: true};
+        var extended = _.extend(destination, source);
+
+        expect(extended.b).to.equal('yes');
+        expect(extended.d).to.equal(true);
       });
 
       it('should not override properties not found in the source', function() {
@@ -413,7 +426,7 @@
         memoSpy(10);
         expect(spy).to.have.been.calledOnce;
       });
-      
+
       it('should not run the memoized function twice when given a reference type as an argument', function() {
         // Be careful how you are checking if a set of arguments has been passed in already
         var spy = sinon.spy(function() { return 'Dummy output'; });
@@ -473,7 +486,7 @@
         expect(shuffled).to.not.equal(numbers);
         expect(numbers).to.eql([4, 5, 6]);
       });
-            
+
       it('should maintain same array length', function() {
         var numbers = [1, 1, 2, 3];
         var shuffled = _.shuffle(numbers);
