@@ -178,9 +178,9 @@
     if (accumulator === undefined) {
       accumulator = collection[0];
     }
-    _.each(modColl, (item) => [
-      accumulator = iterator(accumulator, item)
-    ]);
+    _.each(modColl, (item) => {
+      accumulator = iterator(accumulator, item);
+    });
 
     return accumulator;
   };
@@ -201,12 +201,27 @@
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
+    iterator = iterator || _.identity;
+
+    return _.reduce(collection, function(allTrue, item) {
+      if (!iterator(item)) {
+        return false;
+      }
+      return allTrue;
+    }, true);
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    iterator = iterator || _.identity;
+
+    let allFalse = _.every(collection, (item) => {
+      let isTrue = iterator(item);
+      return !isTrue;
+    });
+    return !allFalse;
   };
 
 
@@ -229,11 +244,35 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    let toExtend = [...arguments].slice(1);
+
+    _.each(toExtend, (element) => {
+      _.each(element, (item, key) => {
+        if (Array.isArray(obj)) {
+          obj.push(item);
+        } else {
+          obj[key] = item;
+        }
+      });
+    });
+
+    return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    let toExtend = [...arguments].slice(1);
+
+    _.each(toExtend, (element) => {
+      _.each(element, (item, key) => {
+        if (obj[key] === undefined) {
+          obj[key] = item;
+        }
+      });
+    });
+
+    return obj;
   };
 
 
@@ -277,6 +316,15 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var previousResults = {};
+
+    return function() {
+      let args = JSON.stringify(arguments);
+      if (previousResults[args] === undefined) {
+        previousResults[args] = func.apply(this, arguments);
+      }
+      return previousResults[args];
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -286,6 +334,10 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    let args = [...arguments].slice(2);
+    setTimeout(() => {
+      func(...args);
+    }, wait);
   };
 
 
@@ -300,6 +352,23 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    let unusedElements = array.slice();
+    let shuffledArray = [];
+
+    const helper = (unusedElements) => {
+      if (unusedElements.length === 0) {
+        return;
+      }
+
+      let inputIndex = Math.floor(Math.random() * unusedElements.length);
+      shuffledArray.push(unusedElements[inputIndex]);
+      unusedElements.splice(inputIndex, 1);
+      helper(unusedElements);
+
+    };
+    helper (unusedElements);
+
+    return shuffledArray;
   };
 
 
